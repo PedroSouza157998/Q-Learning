@@ -5,7 +5,7 @@ socket = cn.connect(2037)
 
 actions = ["left", "right", "jump"]
 
-epochs = 1000
+epochs = 1500
 learning_rate = 0.3
 discount_factor = 0.9
 epsilon = 0.2 
