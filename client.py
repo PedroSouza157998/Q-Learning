@@ -5,12 +5,10 @@ socket = cn.connect(2037)
 
 actions = ["left", "right", "jump"]
 
-epochs = 30000
-learning_rate = 0.3
+epochs = 500
+learning_rate = 0.2
 discount_factor = 0.9
 epsilon = 0.2 
-
-num_states = 100
 
 try:
     q_table = np.loadtxt('resultado.txt')
@@ -30,10 +28,11 @@ def update_q(state, action, reward, next_state):
 
 
 for epoch in range(epochs):
-    print("Época: ",epoch)
+    print("Época: ",epoch+1)
     state = int('0000000', 2)
     done = False
     last_reward = 0
+    last_last_reward = 0
 
     while not done:
         if np.random.rand() < epsilon:
@@ -45,16 +44,22 @@ for epoch in range(epochs):
         action = actions[action_index]
 
         next_state, reward = cn.get_state_reward(socket, action)
+        if(reward == -100): done = True
+        if(reward == 300): done = True
 
-        if(last_reward == reward): reward = reward*2
-        else: last_reward = reward
+        if(last_reward == reward == last_last_reward): reward = -100
+        else: 
+            last_last_reward = last_reward
+            last_reward = reward
+        print("Recompensa: ", reward)
+
         next_state = int(next_state[2:], 2)
 
         update_q(state, action, reward, next_state)
 
         state = next_state
-        if(reward == -100): done = True
-        if(reward > -2): done= True
+    print("----------------------------------------------------------")
+
 
 np.savetxt('resultado.txt', q_table, fmt='%f')
 
